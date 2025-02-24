@@ -6,9 +6,10 @@ const nextConfig = {
   },
   images: { unoptimized: true },
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false,
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
   },
+  optimizeFonts: false,
 };
 
 module.exports = nextConfig;

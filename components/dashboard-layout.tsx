@@ -28,10 +28,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Companies", href: "/dashboard/companies", icon: Building2 },
-    { name: "Events", href: "/dashboard/events", icon: Calendar },
+    { name: "Events", href: "/dashboard/events", icon: Calendar, disabled: true },
     { name: "Event Types", href: "/dashboard/event-types", icon: Tag },
     { name: "Add Company", href: "/dashboard/companies/add", icon: PlusCircle },
-    { name: "Add Event", href: "/dashboard/events/add", icon: PlusCircle },
+    { name: "Add Event", href: "/dashboard/events/add", icon: PlusCircle, disabled: true },
   ];
 
   return (
@@ -100,19 +100,36 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {navigation.map((item) => {
               const Icon = item.icon;
               return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center px-3 py-2 text-sm font-medium rounded-md",
-                    pathname === item.href
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  )}
-                >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
+                item.disabled ? (
+                  <div
+                    key={item.name}
+                    className={cn(
+                      "flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-not-allowed opacity-50",
+                      "text-gray-600"
+                    )}
+                  >
+                    {item.icon && (
+                      <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                    )}
+                    {item.name}
+                  </div>
+                ) : (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center px-3 py-2 text-sm font-medium rounded-md",
+                      pathname === item.href
+                        ? "bg-gray-100 text-gray-900"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    )}
+                  >
+                    {item.icon && (
+                      <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                    )}
+                    {item.name}
+                  </Link>
+                )
               );
             })}
           </nav>
