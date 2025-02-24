@@ -7,29 +7,42 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import DashboardLayout from "@/components/dashboard-layout";
+import { useCreateCompany } from "@/hooks/companies/useCompanies";
+import { CompanyRequest } from "@/types/companies/companyTypes";
 
 export default function AddCompany() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CompanyRequest>({
     name: "",
-    type: "",
     location: "",
-    description: "",
+    bio: "",
+    image: null,
     contactPerson: "",
-    email: "",
-    phone: "",
+    contactInfo: "",
   });
+
+  const { mutate: createCompany, isPending } = useCreateCompany();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push('/dashboard/companies');
+    createCompany(formData, {
+      onSuccess: () => {
+        router.push('/dashboard/companies');
+      },
+    });
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    if (type === 'file') {
+      const fileInput = e.target as HTMLInputElement;
+      const file = fileInput.files?.[0] || null;
+      setFormData((prev) => ({ ...prev, [name]: file }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   return (
@@ -50,16 +63,6 @@ export default function AddCompany() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Company Type</label>
-              <Input
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <label className="text-sm font-medium">Location</label>
               <Input
                 name="location"
@@ -70,47 +73,44 @@ export default function AddCompany() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Description</label>
+              <label className="text-sm font-medium">Bio</label>
               <Textarea
-                name="description"
-                value={formData.description}
+                name="bio"
+                value={formData.bio}
                 onChange={handleChange}
                 rows={4}
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Contact Person</label>
-                <Input
-                  name="contactPerson"
-                  value={formData.contactPerson}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Company Image</label>
+              <Input
+                type="file"
+                name="image"
+                onChange={handleChange}
+                accept="image/*"
+                required
+              />
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Email</label>
-                <Input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Contact Person</label>
+              <Input
+                name="contactPerson"
+                value={formData.contactPerson}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Phone</label>
-                <Input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Contact Number</label>
+              <Input
+                name="contactInfo"
+                value={formData.contactInfo}
+                onChange={handleChange}
+                required
+              />
             </div>
 
             <div className="flex justify-end space-x-4 pt-4">
@@ -121,7 +121,9 @@ export default function AddCompany() {
               >
                 Cancel
               </Button>
-              <Button type="submit">Add Company</Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? 'Adding...' : 'Add Company'}
+              </Button>
             </div>
           </form>
         </Card>
